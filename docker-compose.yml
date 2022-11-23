@@ -9,8 +9,6 @@ services:
        - postgres:postgres
     networks: 
       - postgres
-    #command: tail -F anything
-    
   postgres:
     container_name: postgres_container
     image: postgres:12.1
@@ -18,12 +16,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Welcome01}
       PGDATA: /data/postgres
+      command: /wait-for-it.sh db:5432
     volumes:
       - postgres:/data/postgres
+    
     ports:
       - "5432:5432"
+
+    
     networks: 
       - postgres
+      
+    
     restart: unless-stopped
 
   pgadmin:
