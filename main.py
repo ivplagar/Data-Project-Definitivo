@@ -16,25 +16,26 @@ URL= 'https://valencia.opendatasoft.com/api/records/1.0/search/?dataset=hospital
 respuesta = requests.get(url=URL)
 
 datos=respuesta.json()
-df = pd.json_normalize(datos)
+df = pd.json_normalize(datos['records'])
 #CONEXION A POSTGREESQL
-
+print(df)
 connection = psycopg2.connect(user="postgres", password="Welcome01",host="postgres", port="5432", database="postgres")
 cursor = connection.cursor()
 
 cursor.execute(
   """
     CREATE TABLE IF NOT EXISTS hospitales(
-    nhits integer);
+    nombre varchar(50),
+    coddistrit integer);
   """
 )
 
 for i in range(len(df)):  
   print(i)
 
-  postgres_insert_query = """ INSERT INTO hospitales (nhits) VALUES (%s)"""
+  postgres_insert_query = """ INSERT INTO hospitales (nombre, coddistrit) VALUES (%s)"""
 
-  record_to_insert = (df['nhits'][i])
+  record_to_insert = (df['nombre'][i],df['coddistrit'][i])
   cursor.execute(postgres_insert_query, record_to_insert)
 
 connection.commit()
